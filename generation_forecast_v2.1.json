@@ -1,0 +1,263 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"title": "generation_forecast",
+		"description": "The services provided by this API can be used to obtain the following data:  \n•  \tproduction forecasts in MW for the following terms: D+3 (calculation performed on D-3 for D), Two days later (calculation performed on D-2 for D), The next day (calculation performed on D-1 for D), Intra-daily (calculation performed on the same day); for various sectors (France aggregated, wind power, solar power, facilities covered by the Purchasing Obligation with EDF).",
+		"version": "2.1"
+	},
+	"basePath": "/open_api/generation_forecast/v2",
+	"host": "digital.iservices.rte-france.com",
+	"schemes": [
+		"https"
+	],
+	"paths": {
+		"/forecasts": {
+			"get": {
+				"description": "This resource is for retrieving production forecasts for the following terms:      \n•      \tD+3 (D-3)      \n•      \tTwo days later (D-2)      \n•      \tThe next day (D-1)      \n•      \tIntradaily (ID)      \n•      \tCURRENT",
+				"operationId": "001",
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "start_date",
+						"in": "query",
+						"description": "Forecast search start date (YYYY-MM-DDThh:mm:sszzzzzz)    \n(Cf. GFO-RG01, GFO-RG04, GFO-RG05, GFO-RG07)",
+						"required": false,
+						"type": "string",
+						"format": "date"
+					},
+					{
+						"name": "end_date",
+						"in": "query",
+						"description": "Forecast search end date (YYYY-MM-DDThh:mm:sszzzzzz)  \n(Cf. GFO-RG01, GFO-RG04, GFO-RG05, GFO-RG07)",
+						"required": false,
+						"type": "string",
+						"format": "date"
+					},
+					{
+						"name": "production_type",
+						"in": "query",
+						"description": "Forecast sector  \n(Cf. GFO-RG01, GFO-RG02, GFO-RG05, GFO-RG10)",
+						"required": false,
+						"type": "array",
+						"items": {
+							"type": "string",
+							"format": "enum"
+						},
+						"collectionFormat": "multi",
+						"enum": [
+							"'AGGREGATED_FRANCE",
+							"WIND_ONSHORE",
+							"WIND_OFFSHORE",
+							"SOLAR",
+							"AGGREGATE_CPC",
+							"MDSE'"
+						]
+					},
+					{
+						"name": "type",
+						"in": "query",
+						"description": "Forecast type, term for which the forecast is made  \n(Cf. GFO-RG01, GFO-RG03, GFO-RG05, GFO-RG10)",
+						"required": false,
+						"type": "array",
+						"items": {
+							"type": "string",
+							"format": "enum"
+						},
+						"collectionFormat": "multi",
+						"enum": [
+							"'CURRENT",
+							"ID",
+							"D-1",
+							"D-2",
+							"D-3'"
+						]
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/forecasts"
+							}
+						}
+					},
+					"400": {
+						"description": "GENFORECAST_FORECASTS_F01 - If one of the fields 'start_date' or 'end_date' is used, the two fields are mandatory. Please used either fields or neither.    \n    \nGENFORECAST_FORECASTS_F02 - The field 'start_date' in the API input is more recently than the field 'end_date'. Please correct the values of these fields    \n    \nGENFORECAST_FORECASTS_F03 - The API does not provide feedback on such a long period in one call. To retrieve all the data please make it with severals calls to the API.    \n    \nGENFORECAST_FORECASTS_F04 - The value of 'end_date' field is incorrect. It is not possible to recover data to this term.    \n    \nGENFORECAST_FORECASTS_F05 - The period filled by fields 'start_date' and 'end_date' is too short to return values. Please check the user guide to verify the minimum period for this API.    \n    \nGENFORECAST_FORECASTS_F06 - One of the dates in the API input does not follow the format described in the user guide. Please verify compliance with the format for each field.    \n    \nGENFORECAST_FORECASTS_F07 - One of the enumerated field does not match with the list of expected values. Please verify compliance with the format for each field.  \n  \nGENFORECAST_FORECASTS_F08 - A couple 'production_type' and 'type' in the service entry does not work.",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"408": {
+						"description": "Request Time-out",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"413": {
+						"description": "Request Entity Too Large",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"414": {
+						"description": "Request-URI Too Long",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"503": {
+						"description": "Service Unavailable",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					},
+					"509": {
+						"description": "Bandwidth Limit Exceeded",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"forecasts": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"'CURRENT",
+						"ID",
+						"D-1",
+						"D-2",
+						"D-3'"
+					],
+					"description": "Forecast type for indicating when the forecast for this date was calculated    \\n(Cf.GFO-RG06)"
+				},
+				"sub_type": {
+					"type": "string",
+					"enum": [
+						"'DA01",
+						"DA02",
+						"ID00",
+						"ID01 ... ID24'"
+					],
+					"description": "Forecast subtype for indicating for each type when the forecast was made. Used only with the production sectors: AGREGEE_PO; MDSETRF; MDSESTS    \\n(Cf.GFO-RG06)"
+				},
+				"production_type": {
+					"type": "string",
+					"enum": [
+						"'AGGREGATED_PROGRAMMABLE_FRANCE",
+						"AGGREGATED_NON_PROGRAMMABLE_FRANCE",
+						"WIND_ONSHORE",
+						"WIND_OFFSHORE",
+						"SOLAR",
+						"AGGREGATE_CPC",
+						"MDSETRF",
+						"MDSESTS'"
+					],
+					"description": "Generating sector    \\n(Cf.GFO-RG06)"
+				},
+				"start_date": {
+					"type": "string",
+					"format": "date",
+					"description": "Start date for which the forecast is made (YYYY-MM-DDThh:mm:sszzzzzz)    \\n(Cf.GFO-RG06, GFO-RG09)"
+				},
+				"end_date": {
+					"type": "string",
+					"format": "date",
+					"description": "End date for which the estimate is made (YYYY-MM-DDThh:mm:sszzzzzz)    \\n(Cf.GFO-RG09)"
+				},
+				"values": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/value_forecasts"
+					},
+					"description": "One value per time interval depending on production_type: AGGREGATED_FRANCE: 30 min, WIND: 60 min, SOLAR: 60 min, AGGREGATED_CPC: 30 min, MDSE: 30 min"
+				}
+			}
+		},
+		"value_forecasts": {
+			"type": "object",
+			"properties": {
+				"start_date": {
+					"type": "string",
+					"format": "date",
+					"description": "Start time interval (YYYY-MM-DDThh:mm:sszzzzzz)    \\n(Cf.GFO-RG08)"
+				},
+				"end_date": {
+					"type": "string",
+					"format": "date",
+					"description": "End time interval (YYYY-MM-DDThh:mm:sszzzzzz)    \\n(Cf.GFO-RG08)"
+				},
+				"updated_date": {
+					"type": "string",
+					"format": "date",
+					"description": "Forecast update date (YYYY-MM-DDThh:mm:sszzzzzz)"
+				},
+				"value": {
+					"type": "number",
+					"format": "float",
+					"description": "Forecast value"
+				},
+				"load_factor": {
+					"type": "integer",
+					"format": "int32",
+					"description": "Load factor (expressed as a percentage). Only used with the WIND POWER sector"
+				}
+			}
+		},
+		"error": {
+			"type": "object",
+			"properties": {
+				"error": {
+					"type": "string",
+					"description": "The short description is a code which enables the calling application to automatically process error messages. It is represented by a series of words separated by « _ »"
+				},
+				"error_description": {
+					"type": "string",
+					"description": "The long description is the « message » associated with the code returned, is a description enabling users to understand the source of the error more precisely"
+				}
+			}
+		}
+	}
+}
