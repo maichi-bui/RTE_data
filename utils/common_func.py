@@ -63,6 +63,8 @@ def get_data(url, access_token,headers={}, params=None, encode_dt_param=False):
         response.raise_for_status()
         
         data = response.json()
+        if data: 
+            print('Forecast data fetched successfully.')
         return data
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
