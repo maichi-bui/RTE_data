@@ -5,7 +5,7 @@ from dotenv import load_dotenv, dotenv_values
 load_dotenv() 
 
 
-with open('generation_forecast_v2.1.json', 'r') as file:
+with open('./utils/generation_forecast_v2.1.json', 'r') as file:
     swaggeer_api = json.load(file)
 
 HOST_NAME = swaggeer_api['host']

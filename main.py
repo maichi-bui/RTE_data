@@ -12,7 +12,7 @@ def parse_args():
     parser.add_argument('--end_date', default=datetime.now(), type=lambda dt: datetime.strptime(dt, '%Y-%m-%d %H:%M:%S'),
                         help='end of forecast period')
     
-    parser.add_argument('--interval', default=2,
+    parser.add_argument('--interval', default=2, type=int,
                         help='query interval from now (in days)')
     args = parser.parse_args()
     # round end_date to the next half hour. Example: "2024-11-11 03:03:00" will be rounded to "2024-11-11 03:30:00"
@@ -30,7 +30,7 @@ def main():
     # flatten raw data
     processed_data = process_raw_data(data_res)
     # export to csv file
-    processed_data.to_csv('updated_daily_forecast.csv', index=False)
+    processed_data.to_csv('output_data/updated_daily_forecast.csv', index=False)
 
 if __name__ == '__main__':
     main()
