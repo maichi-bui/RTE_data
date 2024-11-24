@@ -12,6 +12,7 @@ pip3 install -r requirements.txt
 Note that Python version used is 3.9
 
 2. Repository (temp) structure
+```bash    
     .
     ├── notebooks               # POC code in Jupyter notebooks
     │   ├── fetch_data.ipynb    # script to get data of 11 months
@@ -25,7 +26,7 @@ Note that Python version used is 3.9
     ├── requirement.txt         # all packages required for scripts to run 
     ├── README.md               # instructions to run script
     └── ...
-
+```
 3. Configure client ID and secret
 
 - Create a `.env` file at the root of your project and input the BASE64_CLIENT (following the file `.env.sample`), 
@@ -33,6 +34,6 @@ Note that Python version used is 3.9
 
 4. Run `main.py`
 Example:
-```bash
+```python
 python main.py --end_date "2024-11-11 00:00:00" --interval 5
 ```
