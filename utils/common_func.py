@@ -101,19 +101,32 @@ def process_raw_data(forecast_raw: dict):
     """
     forecast_data = pd.DataFrame(forecast_raw['forecasts'])
     # identifier: combination of ['production_type','type','sub_type'] subtype for: AGREGEE_PO; MDSETRF; MDSESTS
+    
     if 'sub_type' in forecast_data.columns:
+        forecast_data.sub_type = forecast_data.sub_type.fillna("na")
         identifier = ['production_type','type','sub_type']
     else:
         identifier = ['production_type','type']
-    
+
     check_unique = forecast_data.groupby(identifier).count()
     
     if check_unique[check_unique != 1].stack().sum() > 0:
-        raise DuplicatedKey(f'Data contain duplicated key of {identifier}')
-        return
+        dup_keys = check_unique[check_unique > 1].dropna().to_dict('split')['index']
+        raise DuplicatedKey(f'Data contain multiple forecasts for one sector: {dup_keys}')
+        
+    
+    forecast_data['start_date'] = forecast_data['start_date'].apply(datetime.fromisoformat)
+    forecast_data['end_date'] = forecast_data['end_date'].apply(datetime.fromisoformat)
+    forecast_data = forecast_data.rename(columns={'start_date':'start_query_date','end_date':'end_query_date'})
+    forecast_data = forecast_data.groupby(identifier).first().reset_index().explode('values')
+    no_forecast = forecast_data[forecast_data['values'].apply(lambda x: isinstance(x, dict)==False)]
 
-    forecast_data = forecast_data.groupby(identifier).first().drop(columns=['start_date','end_date']).reset_index().explode('values')
-    flattened_data = pd.concat([forecast_data['values'].apply(pd.Series), forecast_data.drop('values', axis=1)], axis=1).reset_index(drop=True)
-    flattened_data['start_date'] = flattened_data['start_date'].apply(datetime.fromisoformat)
-    flattened_data['end_date'] = flattened_data['end_date'].apply(datetime.fromisoformat)
+    if len(no_forecast) > 0:
+        print(f'no forecast for {no_forecast.production_type.unique()}')
+
+    forecast_data = forecast_data[forecast_data['values'].apply(lambda x: isinstance(x, dict))]
+    flattened_data = pd.concat([forecast_data['values'].apply(pd.Series), forecast_data.drop('values', axis=1)], axis=1)
+    flattened_data = pd.concat([flattened_data, no_forecast.rename(columns={'values':'value'})]).reset_index(drop=True)
+    # flattened_data['start_date'] = flattened_data['start_date'].apply(datetime.fromisoformat)
+    # flattened_data['end_date'] = flattened_data['end_date'].apply(datetime.fromisoformat)
     return flattened_data
